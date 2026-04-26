@@ -40,8 +40,15 @@ a{text-decoration:none;color:inherit}
 .card-cat{font-size:9px;color:#ff4b4b;font-weight:500;letter-spacing:0.3px;margin-bottom:3px}
 .card-name{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
 .card-price{font-size:15px;font-weight:700;color:#ff4b4b;margin-bottom:4px}
-.card-views{font-size:10px;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:3px}
+.card-views{font-size:10px;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:3px}
 .card-views .dot{color:#ff4b4b;font-size:6px}
+.card-actions{display:flex;gap:6px;margin-bottom:8px}
+.like-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;padding:6px;background:#222;border:1px solid #333;border-radius:6px;color:#888;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s}
+.like-btn.liked{background:#2a1520;border-color:#ff4b4b;color:#ff4b4b}
+.like-btn .heart{font-size:13px;transition:transform 0.2s}
+.like-btn.liked .heart{transform:scale(1.2)}
+.cart-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;padding:6px;background:#222;border:1px solid #333;border-radius:6px;color:#888;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s}
+.cart-btn.in-cart{background:#1a2520;border-color:#4bff7b;color:#4bff7b}
 .card-rank{position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.7);color:#ff4b4b;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
 .card-new{position:absolute;top:6px;right:6px;background:#ff4b4b;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px}
 .card-img-wrap{position:relative}
@@ -49,6 +56,28 @@ a{text-decoration:none;color:inherit}
 .buy-btn:active{background:#cc3333}
 .more-btn{display:block;width:100%;padding:12px;background:transparent;border:1px solid #333;border-radius:10px;color:#888;font-size:13px;font-family:inherit;cursor:pointer;text-align:center;margin-top:12px;transition:all 0.2s}
 .more-btn:hover{border-color:#ff4b4b;color:#ff4b4b}
+
+/* ── 장바구니 플로팅 버튼 ── */
+.cart-float{position:fixed;bottom:20px;right:20px;background:#ff4b4b;color:#fff;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,75,75,0.4);display:flex;align-items:center;justify-content:center;z-index:200;transition:transform 0.2s}
+.cart-float:active{transform:scale(0.9)}
+.cart-float .cart-count{position:absolute;top:-2px;right:-2px;background:#fff;color:#ff4b4b;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* ── 장바구니 패널 ── */
+.cart-panel-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.cart-panel-bg.open{display:flex}
+.cart-panel{background:#1a1a1a;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;max-height:70vh;overflow-y:auto}
+.cart-panel h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.cart-panel h3 span{margin-left:auto;font-size:12px;color:#888;font-weight:400;cursor:pointer}
+.cart-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #242424}
+.cart-item-img{width:50px;height:50px;border-radius:8px;background:#222;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+.cart-item-img img{width:100%;height:100%;object-fit:cover}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:12px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item-price{font-size:13px;font-weight:700;color:#ff4b4b}
+.cart-item-del{background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:4px 8px}
+.cart-item-buy{background:#ff4b4b;border:none;color:#fff;font-size:10px;font-weight:700;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.cart-empty{text-align:center;padding:30px;color:#555;font-size:13px}
+
 .footer{text-align:center;padding:20px;font-size:11px;color:#333;line-height:1.6;border-top:1px solid #1a1a1a;max-width:600px;margin:0 auto}
 .footer a{color:#555;text-decoration:underline}
 @media(min-width:500px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -92,6 +121,17 @@ a{text-decoration:none;color:inherit}
   <div class="empty" id="empty" style="display:none">검색 결과가 없습니다</div>
 </div>
 
+<!-- 장바구니 플로팅 버튼 -->
+<button class="cart-float" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></button>
+
+<!-- 장바구니 패널 -->
+<div class="cart-panel-bg" id="cartPanelBg" onclick="closeCart(event)">
+  <div class="cart-panel" onclick="event.stopPropagation()">
+    <h3>🛒 장바구니 <span onclick="clearCart()">전체 삭제</span></h3>
+    <div id="cartList"></div>
+  </div>
+</div>
+
 <div class="footer">
   이 페이지의 링크는 쿠팡파트너스 활동의 일환으로,<br>
   일정액의 수수료를 제공받을 수 있습니다.<br><br>
@@ -115,22 +155,21 @@ firebase.initializeApp({
 });
 var db = firebase.database();
 var clickData = {};
+var likeData = {};
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    제품 추가 형식:
    {id:"고유번호", name:"제품명", cat:"카테고리", price:"가격", link:"링크", emoji:"이모지", btn:"쿠팡", img:"이미지주소"},
 
-   id: 제품마다 다른 번호 (예: "p01", "p02"...)  ← 필수!
+   id: 제품마다 다른 번호 (p01, p02...)  ← 필수!
    btn: "쿠팡" 또는 "알리" (안쓰면 기본 쿠팡)
    img: 이미지주소 (안쓰면 이모지 표시)
 
    ★ 새 제품은 맨 위에 추가! 위에 있을수록 최신 ★
-   ★ 인기순은 자동! 클릭 많은 순서로 정렬됨 ★
+   ★ 인기순/좋아요 = 자동! ★
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 var products = [
-  /* ★ 새 제품은 여기 맨 위에 추가 ★ */
-
   {id:"p01", name:"불꽃 발사기 프로 마술 트릭", cat:"게임/취미", price:"55,300원", link:"https://s.click.aliexpress.com/e/_c4Ml161V", emoji:"🎮", btn:"알리", img:"https://ae01.alicdn.com/kf/Sff75145f832b4b2b9c40675dae7515d8K.jpg"},
   {id:"p02", name:"다리 보조기구 외골격", cat:"스포츠/아웃도어", price:"42,990원", link:"https://link.coupang.com/a/ewlm0j", emoji:"⛺", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EB%A6%AC%20%EB%B3%B4%EC%A1%B0%20%EC%9E%A5%EC%B9%98.jpg?raw=true"},
   {id:"p03", name:"조이스틱 키캡 세트", cat:"컴퓨터/전자", price:"11,800원", link:"https://link.coupang.com/a/evEQ7Q", emoji:"⌨️", btn:"쿠팡", img:"https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/1bba/ca86e3445995ee67f67bd5fb80bdaa70233690a1200b0dfd30f9d4c84b7f.jpg"},
@@ -177,39 +216,117 @@ var activeCat = "전체";
 var newShowCount = 9;
 var popShowCount = 9;
 
-/* Firebase 실시간 클릭 데이터 읽기 */
-db.ref("clicks").on("value", function(snapshot) {
-  clickData = snapshot.val() || {};
-  render();
-});
+/* 장바구니 (브라우저 저장) */
+var cart = JSON.parse(localStorage.getItem("waku_cart") || "[]");
+/* 내가 좋아요 누른 목록 (브라우저 저장) */
+var myLikes = JSON.parse(localStorage.getItem("waku_likes") || "[]");
 
-/* 클릭 기록 함수 */
-function trackClick(productId, url) {
-  var current = clickData[productId] || 0;
-  db.ref("clicks/" + productId).set(current + 1);
+/* Firebase 실시간 데이터 읽기 */
+db.ref("clicks").on("value", function(s) { clickData = s.val() || {}; render(); });
+db.ref("likes").on("value", function(s) { likeData = s.val() || {}; render(); });
+
+/* 클릭 기록 */
+function trackClick(id, url) {
+  var c = clickData[id] || 0;
+  db.ref("clicks/" + id).set(c + 1);
   window.open(url, "_blank");
 }
 
-function getClicks(id) {
-  return clickData[id] || 0;
+/* 좋아요 토글 */
+function toggleLike(id) {
+  var idx = myLikes.indexOf(id);
+  var current = likeData[id] || 0;
+  if (idx >= 0) {
+    myLikes.splice(idx, 1);
+    db.ref("likes/" + id).set(Math.max(0, current - 1));
+  } else {
+    myLikes.push(id);
+    db.ref("likes/" + id).set(current + 1);
+  }
+  localStorage.setItem("waku_likes", JSON.stringify(myLikes));
+  render();
+}
+
+function getLikes(id) { return likeData[id] || 0; }
+function getClicks(id) { return clickData[id] || 0; }
+function isLiked(id) { return myLikes.indexOf(id) >= 0; }
+
+/* 장바구니 */
+function addToCart(id) {
+  if (cart.indexOf(id) < 0) { cart.push(id); }
+  else { cart.splice(cart.indexOf(id), 1); }
+  localStorage.setItem("waku_cart", JSON.stringify(cart));
+  updateCartCount();
+  render();
+}
+function removeFromCart(id) {
+  var idx = cart.indexOf(id);
+  if (idx >= 0) cart.splice(idx, 1);
+  localStorage.setItem("waku_cart", JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
+  render();
+}
+function clearCart() {
+  cart = [];
+  localStorage.setItem("waku_cart", JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
+  render();
+}
+function isInCart(id) { return cart.indexOf(id) >= 0; }
+function updateCartCount() {
+  document.getElementById("cartCount").textContent = cart.length;
+}
+function findProduct(id) {
+  for (var i = 0; i < products.length; i++) {
+    if (products[i].id === id) return products[i];
+  }
+  return null;
+}
+function openCart() {
+  renderCart();
+  document.getElementById("cartPanelBg").classList.add("open");
+}
+function closeCart(e) {
+  if (e.target === document.getElementById("cartPanelBg")) {
+    document.getElementById("cartPanelBg").classList.remove("open");
+  }
+}
+function renderCart() {
+  var list = document.getElementById("cartList");
+  if (cart.length === 0) {
+    list.innerHTML = "<div class=\"cart-empty\">장바구니가 비어있어요</div>";
+    return;
+  }
+  var html = "";
+  for (var i = 0; i < cart.length; i++) {
+    var item = findProduct(cart[i]);
+    if (!item) continue;
+    var imgHtml = item.img ? "<img src=\"" + item.img + "\" alt=\"\">" : (item.emoji || "📦");
+    var btnText = (item.btn || "쿠팡") + "에서 보기";
+    html += "<div class=\"cart-item\">";
+    html += "<div class=\"cart-item-img\">" + imgHtml + "</div>";
+    html += "<div class=\"cart-item-info\"><div class=\"cart-item-name\">" + item.name + "</div><div class=\"cart-item-price\">" + item.price + "</div></div>";
+    html += "<button class=\"cart-item-buy\" onclick=\"trackClick('" + item.id + "','" + item.link + "')\">" + btnText + "</button>";
+    html += "<button class=\"cart-item-del\" onclick=\"removeFromCart('" + item.id + "')\">✕</button>";
+    html += "</div>";
+  }
+  list.innerHTML = html;
 }
 
 function makeCard(item, badge) {
-  var imgPart = "";
-  if (item.img) {
-    imgPart = "<img src=\"" + item.img + "\" alt=\"\">";
-  } else {
-    imgPart = item.emoji || "📦";
-  }
+  var imgPart = item.img ? "<img src=\"" + item.img + "\" alt=\"\">" : (item.emoji || "📦");
   var btnText = (item.btn || "쿠팡") + "에서 보기 →";
   var badgeHtml = "";
-  if (badge === "new") {
-    badgeHtml = "<span class=\"card-new\">NEW</span>";
-  } else if (badge === "rank") {
-    badgeHtml = "<span class=\"card-rank\">" + item._rank + "위</span>";
-  }
+  if (badge === "new") badgeHtml = "<span class=\"card-new\">NEW</span>";
+  else if (badge === "rank") badgeHtml = "<span class=\"card-rank\">" + item._rank + "위</span>";
+
   var views = getClicks(item.id);
-  var viewText = views > 0 ? views + "명이 봤어요" : "첫 클릭을 기다리는 중";
+  var likes = getLikes(item.id);
+  var liked = isLiked(item.id);
+  var inCart = isInCart(item.id);
+
   var html = "<div class=\"card\">";
   html += "<div class=\"card-img-wrap\"><div class=\"card-img\">" + imgPart + "</div>" + badgeHtml + "</div>";
   html += "<div class=\"card-body\">";
@@ -217,6 +334,10 @@ function makeCard(item, badge) {
   html += "<div class=\"card-name\">" + item.name + "</div>";
   html += "<div class=\"card-price\">" + item.price + "</div>";
   html += "<div class=\"card-views\"><span class=\"dot\">●</span> 조회수 " + views + "</div>";
+  html += "<div class=\"card-actions\">";
+  html += "<button class=\"like-btn" + (liked ? " liked" : "") + "\" onclick=\"toggleLike('" + item.id + "')\"><span class=\"heart\">" + (liked ? "❤️" : "🤍") + "</span>" + likes + "</button>";
+  html += "<button class=\"cart-btn" + (inCart ? " in-cart" : "") + "\" onclick=\"addToCart('" + item.id + "')\">" + (inCart ? "✓ 담김" : "🛒 담기") + "</button>";
+  html += "</div>";
   html += "<a class=\"buy-btn\" href=\"javascript:void(0)\" onclick=\"trackClick('" + item.id + "','" + item.link + "')\">" + btnText + "</a>";
   html += "</div></div>";
   return html;
@@ -248,6 +369,7 @@ function render() {
   }
 
   document.getElementById("countLabel").textContent = "전체 " + filtered.length + "개 제품";
+  updateCartCount();
 
   var isSearching = q.length > 0;
 
@@ -265,9 +387,7 @@ function render() {
     document.getElementById("popSection").style.display = "none";
     document.getElementById("allSection").style.display = "block";
     var allHtml = "";
-    for (i = 0; i < filtered.length; i++) {
-      allHtml += makeCard(filtered[i], "");
-    }
+    for (i = 0; i < filtered.length; i++) { allHtml += makeCard(filtered[i], ""); }
     document.getElementById("allGrid").innerHTML = allHtml;
     return;
   }
@@ -276,49 +396,25 @@ function render() {
   document.getElementById("newSection").style.display = "block";
   document.getElementById("popSection").style.display = "block";
 
-  /* 최신순 = 배열 순서 그대로 */
   var newItems = filtered.slice(0, Math.min(newShowCount, 20));
   var newHtml = "";
-  for (i = 0; i < newItems.length; i++) {
-    newHtml += makeCard(newItems[i], "new");
-  }
+  for (i = 0; i < newItems.length; i++) { newHtml += makeCard(newItems[i], "new"); }
   document.getElementById("newGrid").innerHTML = newHtml;
   document.getElementById("newMoreBtn").style.display = (newShowCount < filtered.length && newShowCount < 20) ? "block" : "none";
 
-  /* 인기순 = 실시간 클릭수 높은 순서 */
   var byPop = filtered.slice();
-  byPop.sort(function(a, b) {
-    return getClicks(b.id) - getClicks(a.id);
-  });
-
+  byPop.sort(function(a, b) { return getClicks(b.id) - getClicks(a.id); });
   var popItems = byPop.slice(0, Math.min(popShowCount, 20));
-  for (i = 0; i < popItems.length; i++) {
-    popItems[i]._rank = i + 1;
-  }
+  for (i = 0; i < popItems.length; i++) { popItems[i]._rank = i + 1; }
   var popHtml = "";
-  for (i = 0; i < popItems.length; i++) {
-    popHtml += makeCard(popItems[i], "rank");
-  }
+  for (i = 0; i < popItems.length; i++) { popHtml += makeCard(popItems[i], "rank"); }
   document.getElementById("popGrid").innerHTML = popHtml;
   document.getElementById("popMoreBtn").style.display = (popShowCount < byPop.length && popShowCount < 20) ? "block" : "none";
 }
 
-function setCat(c) {
-  activeCat = c;
-  newShowCount = 9;
-  popShowCount = 9;
-  render();
-}
-
-function showMoreNew() {
-  newShowCount = Math.min(newShowCount + 9, 20);
-  render();
-}
-
-function showMorePop() {
-  popShowCount = Math.min(popShowCount + 9, 20);
-  render();
-}
+function setCat(c) { activeCat = c; newShowCount = 9; popShowCount = 9; render(); }
+function showMoreNew() { newShowCount = Math.min(newShowCount + 9, 20); render(); }
+function showMorePop() { popShowCount = Math.min(popShowCount + 9, 20); render(); }
 </script>
 </body>
 </html>
