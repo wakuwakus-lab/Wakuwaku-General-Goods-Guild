@@ -39,7 +39,9 @@ a{text-decoration:none;color:inherit}
 .card-body{padding:8px 10px 12px}
 .card-cat{font-size:9px;color:#ff4b4b;font-weight:500;letter-spacing:0.3px;margin-bottom:3px}
 .card-name{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
-.card-price{font-size:15px;font-weight:700;color:#ff4b4b;margin-bottom:8px}
+.card-price{font-size:15px;font-weight:700;color:#ff4b4b;margin-bottom:4px}
+.card-views{font-size:10px;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:3px}
+.card-views .dot{color:#ff4b4b;font-size:6px}
 .card-rank{position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.7);color:#ff4b4b;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
 .card-new{position:absolute;top:6px;right:6px;background:#ff4b4b;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px}
 .card-img-wrap{position:relative}
@@ -77,7 +79,7 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <div class="section" id="popSection">
-    <div class="section-title"><span class="icon">🔥</span> 인기 제품 <span class="sub">BEST SELLERS</span></div>
+    <div class="section-title"><span class="icon">🔥</span> 인기 제품 <span class="sub">실시간 클릭수 기준</span></div>
     <div class="grid" id="popGrid"></div>
     <button class="more-btn" id="popMoreBtn" onclick="showMorePop()">인기 제품 더보기 ▼</button>
   </div>
@@ -96,66 +98,76 @@ a{text-decoration:none;color:inherit}
   <a href="https://www.youtube.com/@이상한물건연구소" target="_blank">유튜브 채널 바로가기</a>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
+/* ━━━━━ Firebase 연결 (건드리지 마세요) ━━━━━ */
+firebase.initializeApp({
+  apiKey: "AIzaSyAzNjCE5K3B4lu_Y3r2h7KixJdvtxSjb-I",
+  authDomain: "wakuwaku-shop.firebaseapp.com",
+  databaseURL: "https://wakuwaku-shop-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "wakuwaku-shop",
+  storageBucket: "wakuwaku-shop.firebasestorage.app",
+  messagingSenderId: "187888458097",
+  appId: "1:187888458097:web:0d7aeeb1690d705b437ed0"
+});
+var db = firebase.database();
+var clickData = {};
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    제품 추가 형식:
-   {name:"제품명", cat:"카테고리", price:"가격", link:"링크", emoji:"이모지", btn:"쿠팡", img:"이미지주소", date:"2026-04-25", pop:5},
+   {id:"고유번호", name:"제품명", cat:"카테고리", price:"가격", link:"링크", emoji:"이모지", btn:"쿠팡", img:"이미지주소"},
 
+   id: 제품마다 다른 번호 (예: "p01", "p02"...)  ← 필수!
    btn: "쿠팡" 또는 "알리" (안쓰면 기본 쿠팡)
    img: 이미지주소 (안쓰면 이모지 표시)
-   date: 등록 날짜 (최신순 정렬용, 안쓰면 맨 뒤로)
-   pop: 인기 점수 (숫자 클수록 위로, 안쓰면 0)
+
+   ★ 새 제품은 맨 위에 추가! 위에 있을수록 최신 ★
+   ★ 인기순은 자동! 클릭 많은 순서로 정렬됨 ★
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 var products = [
-  {name:"조이스틱 키캡 세트", cat:"컴퓨터/전자", price:"11,800원", link:"https://link.coupang.com/a/evEQ7Q", emoji:"⌨️", btn:"쿠팡", img:"https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/1bba/ca86e3445995ee67f67bd5fb80bdaa70233690a1200b0dfd30f9d4c84b7f.jpg", date:"2026-04-25", pop:8},
-  {name:"게이밍 마우스패드 XL 900x400", cat:"컴퓨터/전자", price:"18,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🖱️", btn:"알리", date:"2026-04-20", pop:3},
-  {name:"기계식 키보드 청축 풀배열", cat:"컴퓨터/전자", price:"49,000원", link:"https://link.coupang.com/a/여기에링크", emoji:"🎹", btn:"쿠팡", date:"2026-04-18", pop:5},
+  /* ★ 새 제품은 여기 맨 위에 추가 ★ */
 
-  {name:"Flexpai 2 폰", cat:"가전/디지털", price:"1,280,266원", link:"https://s.click.aliexpress.com/e/_c3XRIip5", emoji:"🎧", btn:"알리", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/digital/%EC%A4%91%EA%B5%AD%20%ED%94%8C%EB%A0%89%EC%8B%9C%EB%B8%94%201.png?raw=true", date:"2026-04-24", pop:9},
-  {name:"미니 보조배터리 10000mAh", cat:"가전/디지털", price:"15,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🔋", btn:"쿠팡", date:"2026-04-15", pop:6},
-  {name:"USB-C 고속충전 케이블 3m 2개입", cat:"가전/디지털", price:"9,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🔌", btn:"알리", date:"2026-04-14", pop:4},
-
-  {name:"테인리스 스틸 국수 제조기", cat:"홈/리빙", price:"1,614,000원", link:"https://s.click.aliexpress.com/e/_c31cWUfZ", emoji:"💡", btn:"알리", img:"https://ae01.alicdn.com/kf/Scdc242c1d6994259b9a7f730824a6275i.jpg", date:"2026-04-23", pop:7},
-  {name:"실리콘 화분 벽걸이", cat:"홈/리빙", price:"8,000원", link:"https://link.coupang.com/a/ewgHA0", emoji:"📱", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/home/%EC%8B%A4%EB%A6%AC%EC%BD%98%20%ED%99%94%EB%B6%84.jpg?raw=true", date:"2026-04-22", pop:4},
-  {name:"무선 미니 가습기 USB형", cat:"홈/리빙", price:"11,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"💧", date:"2026-04-10", pop:2},
-
-  {name:"불꽃 발사기 프로 마술 트릭", cat:"게임/취미", price:"55,300원", link:"https://s.click.aliexpress.com/e/_c4Ml161V", emoji:"🎮", btn:"알리", img:"https://ae01.alicdn.com/kf/Sff75145f832b4b2b9c40675dae7515d8K.jpg", date:"2026-04-26", pop:10},
-  {name:"노트북 거울", cat:"게임/취미", price:"7,000원", link:"https://link.coupang.com/a/ev6MYg", emoji:"🧱", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%EB%85%B8%ED%8A%B8%EB%B6%81%20%EA%B1%B0%EC%9A%B8.webp?raw=true", date:"2026-04-25", pop:7},
-  {name:"물 폭탄 돌리기 게임", cat:"게임/취미", price:"30,000원", link:"https://link.coupang.com/a/ev7mM0", emoji:"🤖", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%ED%8F%AD%ED%83%84.jpg?raw=true", date:"2026-04-24", pop:6},
-
-  {name:"크레이티브 마스크 숄더", cat:"패션/의류", price:"21,000원", link:"https://link.coupang.com/a/ev6Q9a", emoji:"👕", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/fashion/%EB%A7%88%EC%8A%A4%ED%81%AC%20%EA%B0%80%EB%B0%A9.png?raw=true", date:"2026-04-21", pop:5},
-  {name:"스포츠 조거팬츠 남성", cat:"패션/의류", price:"19,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👖", date:"2026-04-12", pop:3},
-  {name:"캔버스 스니커즈 클래식", cat:"패션/의류", price:"24,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👟", date:"2026-04-11", pop:2},
-
-  {name:"내시경 귀파개", cat:"뷰티/헬스", price:"25,000원", link:"https://link.coupang.com/a/ewguY9", emoji:"🪥", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/beauty/%EA%B7%80%ED%8C%8C%EA%B0%9C%20%EB%82%B4%EC%8B%9C%EA%B2%BD.jpg?raw=true", date:"2026-04-23", pop:8},
-  {name:"팬더 실리콘 발패드", cat:"뷰티/헬스", price:"30,300원", link:"https://link.coupang.com/a/ewgAK4", emoji:"🥤", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/beauty/%EC%8B%A4%EB%A6%AC%EC%BD%98%20%EB%95%8C%EB%B0%80%EC%9D%B4.jpg?raw=true", date:"2026-04-22", pop:6},
-  {name:"폼롤러 마사지 스틱", cat:"뷰티/헬스", price:"13,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"💪", date:"2026-04-08", pop:1},
-
-  {name:"프로틴바 단백질바 12개입", cat:"식품/음료", price:"16,800원", link:"https://link.coupang.com/a/여기에링크", emoji:"🍫", date:"2026-04-07", pop:3},
-  {name:"콜드브루 원액 500ml", cat:"식품/음료", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"☕", date:"2026-04-06", pop:2},
-  {name:"견과류 믹스넛 매일견과 30봉", cat:"식품/음료", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🥜", date:"2026-04-05", pop:1},
-
-  {name:"차량용 무선 충전 거치대", cat:"자동차/바이크", price:"22,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🚗", date:"2026-04-04", pop:4},
-  {name:"블랙박스 전후방 FHD", cat:"자동차/바이크", price:"69,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📹", date:"2026-04-03", pop:5},
-  {name:"차량용 방향제 디퓨저", cat:"자동차/바이크", price:"9,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🌿", date:"2026-04-02", pop:1},
-
-  {name:"아이패드 필기감 종이질감 필름", cat:"도서/문구", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📝", date:"2026-04-01", pop:3},
-  {name:"다이어리 플래너 6공 바인더", cat:"도서/문구", price:"11,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"📒", date:"2026-03-30", pop:2},
-  {name:"형광펜 파스텔 6색 세트", cat:"도서/문구", price:"4,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"✏️", date:"2026-03-29", pop:1},
-
-  {name:"고양이 자동 급수기 2L", cat:"반려동물", price:"23,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐱", date:"2026-03-28", pop:4},
-  {name:"강아지 노즈워크 매트", cat:"반려동물", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐶", date:"2026-03-27", pop:3},
-  {name:"반려동물 이동 캐리어 백팩", cat:"반려동물", price:"34,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🎒", date:"2026-03-26", pop:2},
-
-  {name:"다리 보조기구 외골격", cat:"스포츠/아웃도어", price:"42,990원", link:"https://link.coupang.com/a/ewlm0j", emoji:"⛺", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EB%A6%AC%20%EB%B3%B4%EC%A1%B0%20%EC%9E%A5%EC%B9%98.jpg?raw=true", date:"2026-04-26", pop:9},
-  {name:"스마트 낚시 의자 세트", cat:"스포츠/아웃도어", price:"70,200원", link:"https://link.coupang.com/a/ewlxfS", emoji:"🏔️", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EC%9A%A9%EB%8F%84%20%EB%82%9A%EC%8B%9C%20%EB%B0%95%EC%8A%A4.jpg?raw=true", date:"2026-04-25", pop:7},
-  {name:"경량 올인원 캠핑 박스", cat:"스포츠/아웃도어", price:"75,760원", link:"https://link.coupang.com/a/ewlAGh", emoji:"🧊", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EC%9B%90%ED%84%B0%EC%B9%98%20%EC%BA%A0%ED%95%91%20%EB%B0%95%EC%8A%A4.jpg?raw=true", date:"2026-04-24", pop:5},
-  {name:"쿨링 타월 냉감 수건 3장", cat:"스포츠/아웃도어", price:"6,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🧊", date:"2026-04-09", pop:1},
-
-  {name:"아기 물티슈 캡형 80매 10팩", cat:"유아/출산", price:"12,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👶", date:"2026-03-25", pop:3},
-  {name:"유아 실리콘 턱받이 2개입", cat:"유아/출산", price:"8,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🍼", date:"2026-03-24", pop:2},
-  {name:"어린이 목욕 장난감 세트", cat:"유아/출산", price:"11,200원", link:"https://link.coupang.com/a/여기에링크", emoji:"🛁", date:"2026-03-23", pop:1}
+  {id:"p01", name:"불꽃 발사기 프로 마술 트릭", cat:"게임/취미", price:"55,300원", link:"https://s.click.aliexpress.com/e/_c4Ml161V", emoji:"🎮", btn:"알리", img:"https://ae01.alicdn.com/kf/Sff75145f832b4b2b9c40675dae7515d8K.jpg"},
+  {id:"p02", name:"다리 보조기구 외골격", cat:"스포츠/아웃도어", price:"42,990원", link:"https://link.coupang.com/a/ewlm0j", emoji:"⛺", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EB%A6%AC%20%EB%B3%B4%EC%A1%B0%20%EC%9E%A5%EC%B9%98.jpg?raw=true"},
+  {id:"p03", name:"조이스틱 키캡 세트", cat:"컴퓨터/전자", price:"11,800원", link:"https://link.coupang.com/a/evEQ7Q", emoji:"⌨️", btn:"쿠팡", img:"https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/vendor_inventory/1bba/ca86e3445995ee67f67bd5fb80bdaa70233690a1200b0dfd30f9d4c84b7f.jpg"},
+  {id:"p04", name:"노트북 거울", cat:"게임/취미", price:"7,000원", link:"https://link.coupang.com/a/ev6MYg", emoji:"🧱", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%EB%85%B8%ED%8A%B8%EB%B6%81%20%EA%B1%B0%EC%9A%B8.webp?raw=true"},
+  {id:"p05", name:"스마트 낚시 의자 세트", cat:"스포츠/아웃도어", price:"70,200원", link:"https://link.coupang.com/a/ewlxfS", emoji:"🏔️", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EC%9A%A9%EB%8F%84%20%EB%82%9A%EC%8B%9C%20%EB%B0%95%EC%8A%A4.jpg?raw=true"},
+  {id:"p06", name:"Flexpai 2 폰", cat:"가전/디지털", price:"1,280,266원", link:"https://s.click.aliexpress.com/e/_c3XRIip5", emoji:"🎧", btn:"알리", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/digital/%EC%A4%91%EA%B5%AD%20%ED%94%8C%EB%A0%89%EC%8B%9C%EB%B8%94%201.png?raw=true"},
+  {id:"p07", name:"물 폭탄 돌리기 게임", cat:"게임/취미", price:"30,000원", link:"https://link.coupang.com/a/ev7mM0", emoji:"🤖", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%ED%8F%AD%ED%83%84.jpg?raw=true"},
+  {id:"p08", name:"내시경 귀파개", cat:"뷰티/헬스", price:"25,000원", link:"https://link.coupang.com/a/ewguY9", emoji:"🪥", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/beauty/%EA%B7%80%ED%8C%8C%EA%B0%9C%20%EB%82%B4%EC%8B%9C%EA%B2%BD.jpg?raw=true"},
+  {id:"p09", name:"테인리스 스틸 국수 제조기", cat:"홈/리빙", price:"1,614,000원", link:"https://s.click.aliexpress.com/e/_c31cWUfZ", emoji:"💡", btn:"알리", img:"https://ae01.alicdn.com/kf/Scdc242c1d6994259b9a7f730824a6275i.jpg"},
+  {id:"p10", name:"경량 올인원 캠핑 박스", cat:"스포츠/아웃도어", price:"75,760원", link:"https://link.coupang.com/a/ewlAGh", emoji:"🧊", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EC%9B%90%ED%84%B0%EC%B9%98%20%EC%BA%A0%ED%95%91%20%EB%B0%95%EC%8A%A4.jpg?raw=true"},
+  {id:"p11", name:"실리콘 화분 벽걸이", cat:"홈/리빙", price:"8,000원", link:"https://link.coupang.com/a/ewgHA0", emoji:"📱", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/home/%EC%8B%A4%EB%A6%AC%EC%BD%98%20%ED%99%94%EB%B6%84.jpg?raw=true"},
+  {id:"p12", name:"팬더 실리콘 발패드", cat:"뷰티/헬스", price:"30,300원", link:"https://link.coupang.com/a/ewgAK4", emoji:"🥤", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/beauty/%EC%8B%A4%EB%A6%AC%EC%BD%98%20%EB%95%8C%EB%B0%80%EC%9D%B4.jpg?raw=true"},
+  {id:"p13", name:"크레이티브 마스크 숄더", cat:"패션/의류", price:"21,000원", link:"https://link.coupang.com/a/ev6Q9a", emoji:"👕", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/fashion/%EB%A7%88%EC%8A%A4%ED%81%AC%20%EA%B0%80%EB%B0%A9.png?raw=true"},
+  {id:"p14", name:"미니 보조배터리 10000mAh", cat:"가전/디지털", price:"15,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🔋", btn:"쿠팡"},
+  {id:"p15", name:"게이밍 마우스패드 XL 900x400", cat:"컴퓨터/전자", price:"18,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🖱️", btn:"알리"},
+  {id:"p16", name:"기계식 키보드 청축 풀배열", cat:"컴퓨터/전자", price:"49,000원", link:"https://link.coupang.com/a/여기에링크", emoji:"🎹", btn:"쿠팡"},
+  {id:"p17", name:"USB-C 고속충전 케이블 3m 2개입", cat:"가전/디지털", price:"9,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🔌", btn:"알리"},
+  {id:"p18", name:"무선 미니 가습기 USB형", cat:"홈/리빙", price:"11,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"💧"},
+  {id:"p19", name:"스포츠 조거팬츠 남성", cat:"패션/의류", price:"19,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👖"},
+  {id:"p20", name:"캔버스 스니커즈 클래식", cat:"패션/의류", price:"24,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👟"},
+  {id:"p21", name:"폼롤러 마사지 스틱", cat:"뷰티/헬스", price:"13,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"💪"},
+  {id:"p22", name:"프로틴바 단백질바 12개입", cat:"식품/음료", price:"16,800원", link:"https://link.coupang.com/a/여기에링크", emoji:"🍫"},
+  {id:"p23", name:"콜드브루 원액 500ml", cat:"식품/음료", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"☕"},
+  {id:"p24", name:"견과류 믹스넛 매일견과 30봉", cat:"식품/음료", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🥜"},
+  {id:"p25", name:"차량용 무선 충전 거치대", cat:"자동차/바이크", price:"22,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🚗"},
+  {id:"p26", name:"블랙박스 전후방 FHD", cat:"자동차/바이크", price:"69,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📹"},
+  {id:"p27", name:"차량용 방향제 디퓨저", cat:"자동차/바이크", price:"9,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🌿"},
+  {id:"p28", name:"아이패드 필기감 종이질감 필름", cat:"도서/문구", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📝"},
+  {id:"p29", name:"다이어리 플래너 6공 바인더", cat:"도서/문구", price:"11,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"📒"},
+  {id:"p30", name:"형광펜 파스텔 6색 세트", cat:"도서/문구", price:"4,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"✏️"},
+  {id:"p31", name:"고양이 자동 급수기 2L", cat:"반려동물", price:"23,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐱"},
+  {id:"p32", name:"강아지 노즈워크 매트", cat:"반려동물", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐶"},
+  {id:"p33", name:"반려동물 이동 캐리어 백팩", cat:"반려동물", price:"34,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🎒"},
+  {id:"p34", name:"쿨링 타월 냉감 수건 3장", cat:"스포츠/아웃도어", price:"6,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🧊"},
+  {id:"p35", name:"아기 물티슈 캡형 80매 10팩", cat:"유아/출산", price:"12,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👶"},
+  {id:"p36", name:"유아 실리콘 턱받이 2개입", cat:"유아/출산", price:"8,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🍼"},
+  {id:"p37", name:"어린이 목욕 장난감 세트", cat:"유아/출산", price:"11,200원", link:"https://link.coupang.com/a/여기에링크", emoji:"🛁"}
 ];
 
 /* ━━━━━ 아래는 건드리지 마세요 ━━━━━ */
@@ -164,6 +176,23 @@ var catOrder = ["전체","컴퓨터/전자","가전/디지털","홈/리빙","게
 var activeCat = "전체";
 var newShowCount = 9;
 var popShowCount = 9;
+
+/* Firebase 실시간 클릭 데이터 읽기 */
+db.ref("clicks").on("value", function(snapshot) {
+  clickData = snapshot.val() || {};
+  render();
+});
+
+/* 클릭 기록 함수 */
+function trackClick(productId, url) {
+  var current = clickData[productId] || 0;
+  db.ref("clicks/" + productId).set(current + 1);
+  window.open(url, "_blank");
+}
+
+function getClicks(id) {
+  return clickData[id] || 0;
+}
 
 function makeCard(item, badge) {
   var imgPart = "";
@@ -179,13 +208,16 @@ function makeCard(item, badge) {
   } else if (badge === "rank") {
     badgeHtml = "<span class=\"card-rank\">" + item._rank + "위</span>";
   }
+  var views = getClicks(item.id);
+  var viewText = views > 0 ? views + "명이 봤어요" : "첫 클릭을 기다리는 중";
   var html = "<div class=\"card\">";
   html += "<div class=\"card-img-wrap\"><div class=\"card-img\">" + imgPart + "</div>" + badgeHtml + "</div>";
   html += "<div class=\"card-body\">";
   html += "<div class=\"card-cat\">" + item.cat + "</div>";
   html += "<div class=\"card-name\">" + item.name + "</div>";
   html += "<div class=\"card-price\">" + item.price + "</div>";
-  html += "<a class=\"buy-btn\" href=\"" + item.link + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + btnText + "</a>";
+  html += "<div class=\"card-views\"><span class=\"dot\">●</span> 조회수 " + views + "</div>";
+  html += "<a class=\"buy-btn\" href=\"javascript:void(0)\" onclick=\"trackClick('" + item.id + "','" + item.link + "')\">" + btnText + "</a>";
   html += "</div></div>";
   return html;
 }
@@ -244,30 +276,19 @@ function render() {
   document.getElementById("newSection").style.display = "block";
   document.getElementById("popSection").style.display = "block";
 
-  /* 최신순 정렬 */
-  var byDate = filtered.slice();
-  byDate.sort(function(a, b) {
-    var da = a.date || "0000-00-00";
-    var db = b.date || "0000-00-00";
-    if (da > db) return -1;
-    if (da < db) return 1;
-    return 0;
-  });
-
-  var newItems = byDate.slice(0, Math.min(newShowCount, 20));
+  /* 최신순 = 배열 순서 그대로 */
+  var newItems = filtered.slice(0, Math.min(newShowCount, 20));
   var newHtml = "";
   for (i = 0; i < newItems.length; i++) {
     newHtml += makeCard(newItems[i], "new");
   }
   document.getElementById("newGrid").innerHTML = newHtml;
-  document.getElementById("newMoreBtn").style.display = (newShowCount < byDate.length && newShowCount < 20) ? "block" : "none";
+  document.getElementById("newMoreBtn").style.display = (newShowCount < filtered.length && newShowCount < 20) ? "block" : "none";
 
-  /* 인기순 정렬 */
+  /* 인기순 = 실시간 클릭수 높은 순서 */
   var byPop = filtered.slice();
   byPop.sort(function(a, b) {
-    var pa = a.pop || 0;
-    var pb = b.pop || 0;
-    return pb - pa;
+    return getClicks(b.id) - getClicks(a.id);
   });
 
   var popItems = byPop.slice(0, Math.min(popShowCount, 20));
@@ -298,8 +319,6 @@ function showMorePop() {
   popShowCount = Math.min(popShowCount + 9, 20);
   render();
 }
-
-render();
 </script>
 </body>
 </html>
