@@ -56,13 +56,9 @@ a{text-decoration:none;color:inherit}
 .buy-btn:active{background:#cc3333}
 .more-btn{display:block;width:100%;padding:12px;background:transparent;border:1px solid #333;border-radius:10px;color:#888;font-size:13px;font-family:inherit;cursor:pointer;text-align:center;margin-top:12px;transition:all 0.2s}
 .more-btn:hover{border-color:#ff4b4b;color:#ff4b4b}
-
-/* ── 장바구니 플로팅 버튼 ── */
 .cart-float{position:fixed;bottom:20px;right:20px;background:#ff4b4b;color:#fff;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,75,75,0.4);display:flex;align-items:center;justify-content:center;z-index:200;transition:transform 0.2s}
 .cart-float:active{transform:scale(0.9)}
 .cart-float .cart-count{position:absolute;top:-2px;right:-2px;background:#fff;color:#ff4b4b;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-
-/* ── 장바구니 패널 ── */
 .cart-panel-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:none;align-items:flex-end;justify-content:center}
 .cart-panel-bg.open{display:flex}
 .cart-panel{background:#1a1a1a;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;max-height:70vh;overflow-y:auto}
@@ -77,7 +73,6 @@ a{text-decoration:none;color:inherit}
 .cart-item-del{background:none;border:none;color:#555;font-size:18px;cursor:pointer;padding:4px 8px}
 .cart-item-buy{background:#ff4b4b;border:none;color:#fff;font-size:10px;font-weight:700;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
 .cart-empty{text-align:center;padding:30px;color:#555;font-size:13px}
-
 .footer{text-align:center;padding:20px;font-size:11px;color:#333;line-height:1.6;border-top:1px solid #1a1a1a;max-width:600px;margin:0 auto}
 .footer a{color:#555;text-decoration:underline}
 @media(min-width:500px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -121,10 +116,8 @@ a{text-decoration:none;color:inherit}
   <div class="empty" id="empty" style="display:none">검색 결과가 없습니다</div>
 </div>
 
-<!-- 장바구니 플로팅 버튼 -->
 <button class="cart-float" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></button>
 
-<!-- 장바구니 패널 -->
 <div class="cart-panel-bg" id="cartPanelBg" onclick="closeCart(event)">
   <div class="cart-panel" onclick="event.stopPropagation()">
     <h3>🛒 장바구니 <span onclick="clearCart()">전체 삭제</span></h3>
@@ -138,12 +131,10 @@ a{text-decoration:none;color:inherit}
   <a href="https://www.youtube.com/@이상한물건연구소" target="_blank">유튜브 채널 바로가기</a>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-/* ━━━━━ Firebase 연결 (건드리지 마세요) ━━━━━ */
 firebase.initializeApp({
   apiKey: "AIzaSyAzNjCE5K3B4lu_Y3r2h7KixJdvtxSjb-I",
   authDomain: "wakuwaku-shop.firebaseapp.com",
@@ -170,8 +161,10 @@ var likeData = {};
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 var products = [
-  {id:"p32", name:"마그네틱 볼", cat:"게임/취미", price:"48,600원", link:"https://link.coupang.com/a/exbBb0", emoji:"🍼",btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%EB%A7%88%EA%B7%B8%EB%84%A4%ED%8B%B1%20%EB%B3%BC.jpg?raw=true"},
-  {id:"p31", name:"고양이 바퀴벌레 코스튬", cat:"반려동물", price:"4,265원", link:"https://s.click.aliexpress.com/e/_c4B3cpaL", emoji:"🐱",btn:"알리", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/pet/%EC%9D%B4%EB%A0%88%EC%A6%88%EB%AF%B8%20%EA%B0%9C%EC%98%B7.jpg?raw=true"},
+  /* ★ 새 제품은 여기 맨 위에 추가 ★ */
+
+  {id:"p32", name:"마그네틱 볼", cat:"게임/취미", price:"48,600원", link:"https://link.coupang.com/a/exbBb0", emoji:"🍼", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/game/%EB%A7%88%EA%B7%B8%EB%84%A4%ED%8B%B1%20%EB%B3%BC.jpg?raw=true"},
+  {id:"p31", name:"고양이 바퀴벌레 코스튬", cat:"반려동물", price:"4,265원", link:"https://s.click.aliexpress.com/e/_c4B3cpaL", emoji:"🐱", btn:"알리", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/pet/%EC%9D%B4%EB%A0%88%EC%A6%88%EB%AF%B8%20%EA%B0%9C%EC%98%B7.jpg?raw=true"},
   {id:"p01", name:"불꽃 발사기 프로 마술 트릭", cat:"게임/취미", price:"55,300원", link:"https://s.click.aliexpress.com/e/_c4Ml161V", emoji:"🎮", btn:"알리", img:"https://ae01.alicdn.com/kf/Sff75145f832b4b2b9c40675dae7515d8K.jpg"},
   {id:"p02", name:"다리 보조기구 외골격", cat:"스포츠/아웃도어", price:"42,990원", link:"https://link.coupang.com/a/ewlm0j", emoji:"⛺", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/sports/%EB%8B%A4%EB%A6%AC%20%EB%B3%B4%EC%A1%B0%20%EC%9E%A5%EC%B9%98.jpg?raw=true"},
   {id:"p03", name:"조이스틱 키캡 세트", cat:"컴퓨터/전자", price:"11,800원", link:"https://link.coupang.com/a/evEQ7Q", emoji:"⌨️", btn:"쿠팡", img:"https://github.com/wakuwakus-lab/Wakuwaku-General-Goods-Guild/blob/main/img/computer/%ED%82%A4%EB%B3%B4%EB%93%9C%20%EC%A1%B0%EC%9D%B4%EC%8A%A4%ED%8B%B1.jpg?raw=true"},
@@ -196,13 +189,13 @@ var products = [
   {id:"p22", name:"프로틴바 단백질바 12개입", cat:"식품/음료", price:"16,800원", link:"https://link.coupang.com/a/여기에링크", emoji:"🍫"},
   {id:"p23", name:"콜드브루 원액 500ml", cat:"식품/음료", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"☕"},
   {id:"p24", name:"견과류 믹스넛 매일견과 30봉", cat:"식품/음료", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🥜"},
-  {id:"p25", name:"차량용 무선 충전 거치대", cat:"자동차/바이크", price:"22,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🚗"},
-  {id:"p26", name:"블랙박스 전후방 FHD", cat:"자동차/바이크", price:"69,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📹"},
-  {id:"p27", name:"차량용 방향제 디퓨저", cat:"자동차/바이크", price:"9,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🌿"},
+  {id:"p25", name:"차량용 무선 충전 거치대", cat:"자동차/공구", price:"22,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🚗"},
+  {id:"p26", name:"블랙박스 전후방 FHD", cat:"자동차/공구", price:"69,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📹"},
+  {id:"p27", name:"차량용 방향제 디퓨저", cat:"자동차/공구", price:"9,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"🌿"},
   {id:"p28", name:"아이패드 필기감 종이질감 필름", cat:"도서/문구", price:"8,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"📝"},
   {id:"p29", name:"다이어리 플래너 6공 바인더", cat:"도서/문구", price:"11,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"📒"},
-  {id:"p30", name:"형광펜 파스텔 6색 세트", cat:"도서/문구", price:"4,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"✏️",},
-  {id:"p32", name:"강아지 노즈워크 매트", cat:"반려동물", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐶"},
+  {id:"p30", name:"형광펜 파스텔 6색 세트", cat:"도서/문구", price:"4,500원", link:"https://link.coupang.com/a/여기에링크", emoji:"✏️"},
+  {id:"p38", name:"강아지 노즈워크 매트", cat:"반려동물", price:"14,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🐶"},
   {id:"p33", name:"반려동물 이동 캐리어 백팩", cat:"반려동물", price:"34,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🎒"},
   {id:"p34", name:"쿨링 타월 냉감 수건 3장", cat:"스포츠/아웃도어", price:"6,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"🧊"},
   {id:"p35", name:"아기 물티슈 캡형 80매 10팩", cat:"유아/출산", price:"12,900원", link:"https://link.coupang.com/a/여기에링크", emoji:"👶"},
@@ -212,28 +205,23 @@ var products = [
 
 /* ━━━━━ 아래는 건드리지 마세요 ━━━━━ */
 
-var catOrder = ["전체","컴퓨터/전자","가전/디지털","홈/리빙","게임/취미","패션/의류","뷰티/헬스","식품/음료","자동차/바이크","도서/문구","반려동물","스포츠/아웃도어","유아/출산"];
+var catOrder = ["전체","컴퓨터/전자","가전/디지털","홈/리빙","게임/취미","패션/의류","뷰티/헬스","식품/음료","자동차/공구","도서/문구","반려동물","스포츠/아웃도어","유아/출산"];
 var activeCat = "전체";
 var newShowCount = 9;
 var popShowCount = 9;
 
-/* 장바구니 (브라우저 저장) */
 var cart = JSON.parse(localStorage.getItem("waku_cart") || "[]");
-/* 내가 좋아요 누른 목록 (브라우저 저장) */
 var myLikes = JSON.parse(localStorage.getItem("waku_likes") || "[]");
 
-/* Firebase 실시간 데이터 읽기 */
 db.ref("clicks").on("value", function(s) { clickData = s.val() || {}; render(); });
 db.ref("likes").on("value", function(s) { likeData = s.val() || {}; render(); });
 
-/* 클릭 기록 */
 function trackClick(id, url) {
   var c = clickData[id] || 0;
   db.ref("clicks/" + id).set(c + 1);
   window.open(url, "_blank");
 }
 
-/* 좋아요 토글 */
 function toggleLike(id) {
   var idx = myLikes.indexOf(id);
   var current = likeData[id] || 0;
@@ -252,7 +240,6 @@ function getLikes(id) { return likeData[id] || 0; }
 function getClicks(id) { return clickData[id] || 0; }
 function isLiked(id) { return myLikes.indexOf(id) >= 0; }
 
-/* 장바구니 */
 function addToCart(id) {
   if (cart.indexOf(id) < 0) { cart.push(id); }
   else { cart.splice(cart.indexOf(id), 1); }
@@ -322,12 +309,10 @@ function makeCard(item, badge) {
   var badgeHtml = "";
   if (badge === "new") badgeHtml = "<span class=\"card-new\">NEW</span>";
   else if (badge === "rank") badgeHtml = "<span class=\"card-rank\">" + item._rank + "위</span>";
-
   var views = getClicks(item.id);
   var likes = getLikes(item.id);
   var liked = isLiked(item.id);
   var inCart = isInCart(item.id);
-
   var html = "<div class=\"card\">";
   html += "<div class=\"card-img-wrap\"><div class=\"card-img\">" + imgPart + "</div>" + badgeHtml + "</div>";
   html += "<div class=\"card-body\">";
@@ -353,14 +338,12 @@ function render() {
   for (i = 0; i < catOrder.length; i++) {
     if (catOrder[i] === "전체" || usedCats[catOrder[i]]) cats.push(catOrder[i]);
   }
-
   var catHtml = "";
   for (i = 0; i < cats.length; i++) {
     var c = cats[i];
     catHtml += "<button class=\"cat-btn" + (c === activeCat ? " active" : "") + "\" onclick=\"setCat('" + c + "')\">" + c + "</button>";
   }
   document.getElementById("catBar").innerHTML = catHtml;
-
   var filtered = [];
   for (i = 0; i < products.length; i++) {
     var p = products[i];
@@ -368,12 +351,9 @@ function render() {
     var matchQ = !q || p.name.toLowerCase().indexOf(q) >= 0 || p.cat.toLowerCase().indexOf(q) >= 0;
     if (matchCat && matchQ) filtered.push(p);
   }
-
   document.getElementById("countLabel").textContent = "전체 " + filtered.length + "개 제품";
   updateCartCount();
-
   var isSearching = q.length > 0;
-
   if (filtered.length === 0) {
     document.getElementById("empty").style.display = "block";
     document.getElementById("newSection").style.display = "none";
@@ -382,7 +362,6 @@ function render() {
     return;
   }
   document.getElementById("empty").style.display = "none";
-
   if (isSearching) {
     document.getElementById("newSection").style.display = "none";
     document.getElementById("popSection").style.display = "none";
@@ -392,17 +371,14 @@ function render() {
     document.getElementById("allGrid").innerHTML = allHtml;
     return;
   }
-
   document.getElementById("allSection").style.display = "none";
   document.getElementById("newSection").style.display = "block";
   document.getElementById("popSection").style.display = "block";
-
   var newItems = filtered.slice(0, Math.min(newShowCount, 20));
   var newHtml = "";
   for (i = 0; i < newItems.length; i++) { newHtml += makeCard(newItems[i], "new"); }
   document.getElementById("newGrid").innerHTML = newHtml;
   document.getElementById("newMoreBtn").style.display = (newShowCount < filtered.length && newShowCount < 20) ? "block" : "none";
-
   var byPop = filtered.slice();
   byPop.sort(function(a, b) { return getClicks(b.id) - getClicks(a.id); });
   var popItems = byPop.slice(0, Math.min(popShowCount, 20));
